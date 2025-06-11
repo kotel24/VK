@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ru.mygames.vk"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ru.mygames.vk"
@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.compose.runtime:runtime-livedata:1.8.2")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
