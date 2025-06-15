@@ -8,15 +8,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.mygames.vk.MainViewModel
-import ru.mygames.vk.PostCard
-import ru.mygames.vk.domain.FeedPost
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -44,10 +41,6 @@ fun MainScreen(viewModel: MainViewModel){
             }
         }
     ){
-        val feedPost = viewModel.feedPost.observeAsState(FeedPost())
-        PostCard(modifier = Modifier.padding(8.dp), feedPost = feedPost.value,
-            onStatisticsItemClickListener = {
-                viewModel.updateCount(it)
-            })
+        PostCardList(viewModel = viewModel, modifier = Modifier.padding(8.dp))
     }
 }

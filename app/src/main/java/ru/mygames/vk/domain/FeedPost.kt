@@ -3,6 +3,7 @@ package ru.mygames.vk.domain
 import ru.mygames.vk.R
 
 data class FeedPost(
+    val id: Int = 0,
     val communityName: String = "уволено",
     val publicationDate: String = "14:00",
     val avatarResId: Int = R.drawable.baseline_account_circle_24,
