@@ -8,27 +8,39 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import ru.mygames.vk.MainViewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.currentBackStackEntryAsState
+import ru.mygames.vk.domain.FeedPost
+import ru.mygames.vk.navigation.AppNavGraph
+import ru.mygames.vk.navigation.Screen
+import ru.mygames.vk.navigation.rememberNavigationState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(viewModel: MainViewModel){
-    Scaffold (
+fun MainScreen() {
+    val navigationState = rememberNavigationState()
+    Scaffold(
         bottomBar = {
             NavigationBar {
-                val selectedItemPosition = remember {  mutableStateOf(0) }
-
-                val items = listOf(NavigationItem.Home, NavigationItem.Favourite, NavigationItem.Profile)
-                items.forEachIndexed { index, item ->
+                val navBackStackEntry =
+                    navigationState.navHostController.currentBackStackEntryAsState()
+                val items =
+                    listOf(NavigationItem.Home, NavigationItem.Favourite, NavigationItem.Profile)
+                items.forEach { item ->
+                    val selected = navBackStackEntry?.value?.destination?.hierarchy?.any{
+                        it.route == item.screen.route
+                    } ?: false
                     NavigationBarItem(
-                        selected = selectedItemPosition.value == index,
+                        selected = selected,
                         onClick = {
-                            selectedItemPosition.value = index
+                            if (!selected)
+                                navigationState.navigateTo(route = item.screen.route)
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -40,7 +52,25 @@ fun MainScreen(viewModel: MainViewModel){
                 }
             }
         }
-    ){
-        PostCardList(viewModel = viewModel, modifier = Modifier.padding(8.dp))
+    ) {
+        AppNavGraph(
+            navHostController = navigationState.navHostController,
+            newsFeedScreenContent = {
+                HomeScreen(
+                    modifier = Modifier.padding(8.dp),
+                    onCommentClickListener = {
+                        navigationState.navigateToComments(it)
+                    }
+                )
+            },
+            commentsScreenContent = { feedPost ->
+                CommentsScreen(
+                    onBackPressed = { navigationState.navHostController.popBackStack() },
+                    feedPost = feedPost
+                )
+            },
+            favoriteScreenContent = { Text(text = "Favourite") },
+            profileScreenContent = { Text(text = "Profile") }
+        )
     }
 }
