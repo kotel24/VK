@@ -1,6 +1,7 @@
 package ru.mygames.vk.data.repository
 
 import android.app.Application
+import android.util.Log
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
@@ -21,10 +22,13 @@ import ru.mygames.vk.domain.ItemInfo
 import ru.mygames.vk.domain.PostComment
 import ru.mygames.vk.domain.StatisticItem
 import ru.mygames.vk.extensions.mergeWith
+import ru.mygames.vk.domain.AuthState
 
 class NewsFeedRepository(application: Application) {
     private val storage = VKPreferencesKeyValueStorage(application)
-    private val token = VKAccessToken.restore(storage)
+    private val token
+        get() = VKAccessToken.restore(storage)
+
     private val apiService = ApiFactory.apiService
     private val mapper = NewsFeedMapper()
 
@@ -59,6 +63,21 @@ class NewsFeedRepository(application: Application) {
 
     private var nextFrom: String? = null
 
+    private val checkAuthStateEvents = MutableSharedFlow<Unit>(replay = 1)
+
+    val authStateFlow = flow{
+        checkAuthStateEvents.emit(Unit)
+        checkAuthStateEvents.collect{
+            val currentToken = token
+            val loggedIn = currentToken!= null && currentToken.isValid
+            val authState = if (loggedIn) {
+                AuthState.Authorized
+            } else {
+                AuthState.UnAuthorized
+            }
+            emit(authState)
+        }
+    }.stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = AuthState.Initial)
 
     val recommendations: StateFlow<List<FeedPost>> = loadedListFlow
         .mergeWith(refreshListFlow)
@@ -72,6 +91,9 @@ class NewsFeedRepository(application: Application) {
         nextDataNeededEvents.emit(Unit)
     }
 
+    suspend fun checkAuthState() {
+        checkAuthStateEvents.emit(Unit)
+    }
     fun getComments(feedPost: FeedPost): Flow<List<PostComment>> = flow{
         val response = apiService.getComments(
             token = getAccessToken(),

@@ -1,4 +1,4 @@
-package ru.mygames.vk.presentation.main
+package ru.mygames.vk.domain
 
 sealed class AuthState {
     object Initial : AuthState()
