@@ -1,4 +1,4 @@
-package ru.mygames.vk.ui.theme
+package ru.mygames.vk.presentation.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite

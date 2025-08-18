@@ -1,4 +1,4 @@
-package ru.mygames.vk.ui.theme
+package ru.mygames.vk.presentation.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
@@ -8,18 +8,16 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import ru.mygames.vk.domain.FeedPost
 import ru.mygames.vk.navigation.AppNavGraph
-import ru.mygames.vk.navigation.Screen
 import ru.mygames.vk.navigation.rememberNavigationState
+import ru.mygames.vk.presentation.comments.CommentsScreen
+import ru.mygames.vk.presentation.news.NewsFeedScreen
+import ru.mygames.vk.presentation.main.NavigationItem
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -56,9 +54,10 @@ fun MainScreen() {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             newsFeedScreenContent = {
-                HomeScreen(
+                NewsFeedScreen(
                     modifier = Modifier.padding(8.dp),
                     onCommentClickListener = {
+
                         navigationState.navigateToComments(it)
                     }
                 )
