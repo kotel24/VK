@@ -2,7 +2,7 @@ package ru.mygames.vk.navigation
 
 import android.net.Uri
 import com.google.gson.Gson
-import ru.mygames.vk.domain.FeedPost
+import ru.mygames.vk.domain.entity.FeedPost
 
 sealed class Screen (
     val route: String

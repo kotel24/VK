@@ -2,10 +2,10 @@ package ru.mygames.vk.data.mapper
 
 import ru.mygames.vk.data.model.CommentsResponseDto
 import ru.mygames.vk.data.model.NewsFeedResponseDto
-import ru.mygames.vk.domain.FeedPost
-import ru.mygames.vk.domain.ItemInfo
-import ru.mygames.vk.domain.PostComment
-import ru.mygames.vk.domain.StatisticItem
+import ru.mygames.vk.domain.entity.FeedPost
+import ru.mygames.vk.domain.entity.ItemInfo
+import ru.mygames.vk.domain.entity.PostComment
+import ru.mygames.vk.domain.entity.StatisticItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

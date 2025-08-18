@@ -1,6 +1,6 @@
 package ru.mygames.vk.presentation.news
 
-import ru.mygames.vk.domain.FeedPost
+import ru.mygames.vk.domain.entity.FeedPost
 
 sealed class NewsFeedScreenState {
     object Initial : NewsFeedScreenState()

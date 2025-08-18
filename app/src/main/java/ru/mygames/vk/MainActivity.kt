@@ -5,11 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKScope
-import ru.mygames.vk.domain.AuthState
+import ru.mygames.vk.domain.entity.AuthState
 import ru.mygames.vk.presentation.main.LoginScreen
 import ru.mygames.vk.presentation.main.MainScreen
 import ru.mygames.vk.presentation.main.MainViewModel

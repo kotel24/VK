@@ -1,4 +1,4 @@
-package ru.mygames.vk.domain
+package ru.mygames.vk.domain.entity
 
 sealed class AuthState {
     object Initial : AuthState()

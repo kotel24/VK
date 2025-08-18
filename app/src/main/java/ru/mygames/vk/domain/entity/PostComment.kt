@@ -1,4 +1,4 @@
-package ru.mygames.vk.domain
+package ru.mygames.vk.domain.entity
 
 data class PostComment(
     val id: Long,

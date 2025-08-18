@@ -1,7 +1,6 @@
 package ru.mygames.vk.presentation.news
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,9 +31,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ru.mygames.vk.R
-import ru.mygames.vk.domain.FeedPost
-import ru.mygames.vk.domain.ItemInfo
-import ru.mygames.vk.domain.StatisticItem
+import ru.mygames.vk.domain.entity.FeedPost
+import ru.mygames.vk.domain.entity.ItemInfo
+import ru.mygames.vk.domain.entity.StatisticItem
 import ru.mygames.vk.ui.theme.Black500
 
 @Composable

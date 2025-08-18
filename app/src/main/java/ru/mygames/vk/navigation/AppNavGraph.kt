@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ru.mygames.vk.domain.FeedPost
+import ru.mygames.vk.domain.entity.FeedPost
 
 @Composable
 fun AppNavGraph(
