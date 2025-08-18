@@ -1,8 +1,10 @@
 package ru.mygames.vk.presentation.news
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -13,6 +15,10 @@ import ru.mygames.vk.domain.FeedPost
 import ru.mygames.vk.extensions.mergeWith
 
 class NewsFeedViewModel(application: Application) : AndroidViewModel(application) {
+    private val exceptionHandler = CoroutineExceptionHandler{_, _ ->
+        Log.d("NewsFeedViewModel", "Error occurred in coroutine")
+    }
+
     private val repository = NewsFeedRepository(application)
     private val recommendationsFlow = repository.recommendations
     private val loadNextDataFlow = MutableSharedFlow<NewsFeedScreenState>()
@@ -35,14 +41,14 @@ class NewsFeedViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun changeLikeStatus(feedPost: FeedPost) {
-        viewModelScope.launch {
+        viewModelScope.launch (exceptionHandler) {
             repository.changeLikeStatus(feedPost)
         }
     }
 
 
     fun delete(model: FeedPost) {
-        viewModelScope.launch {
+        viewModelScope.launch (exceptionHandler){
             repository.ignoreItem(model)
         }
     }
