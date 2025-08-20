@@ -15,13 +15,14 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.mygames.vk.navigation.AppNavGraph
 import ru.mygames.vk.navigation.rememberNavigationState
+import ru.mygames.vk.presentation.ViewModelFactory
 import ru.mygames.vk.presentation.comments.CommentsScreen
 import ru.mygames.vk.presentation.news.NewsFeedScreen
 import ru.mygames.vk.presentation.main.NavigationItem
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModelFactory: ViewModelFactory) {
     val navigationState = rememberNavigationState()
     Scaffold(
         bottomBar = {
@@ -55,6 +56,7 @@ fun MainScreen() {
             navHostController = navigationState.navHostController,
             newsFeedScreenContent = {
                 NewsFeedScreen(
+                    viewModelFactory = viewModelFactory,
                     modifier = Modifier.padding(8.dp),
                     onCommentClickListener = {
 
@@ -64,6 +66,7 @@ fun MainScreen() {
             },
             commentsScreenContent = { feedPost ->
                 CommentsScreen(
+                    viewModelFactory,
                     onBackPressed = { navigationState.navHostController.popBackStack() },
                     feedPost = feedPost
                 )

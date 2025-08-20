@@ -9,9 +9,10 @@ import ru.mygames.vk.domain.entity.StatisticItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.math.absoluteValue
 
-class NewsFeedMapper {
+class NewsFeedMapper @Inject constructor(){
     fun mapResponseToComments(responseDto: CommentsResponseDto): List<PostComment> {
         val result = mutableListOf<PostComment>()
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import ru.mygames.vk.data.mapper.NewsFeedMapper
 import ru.mygames.vk.data.network.ApiFactory
+import ru.mygames.vk.data.network.ApiService
 import ru.mygames.vk.domain.entity.AuthState
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.ItemInfo
@@ -16,12 +17,14 @@ import ru.mygames.vk.domain.entity.PostComment
 import ru.mygames.vk.domain.entity.StatisticItem
 import ru.mygames.vk.domain.repository.NewsFeedRepository
 import ru.mygames.vk.extensions.mergeWith
+import javax.inject.Inject
 
-class NewsFeedRepositoryImpl(application: Application) : NewsFeedRepository {
+class NewsFeedRepositoryImpl @Inject constructor (
+    private val apiService: ApiService,
+    private val mapper: NewsFeedMapper,
+    private val storage: VKPreferencesKeyValueStorage
+) : NewsFeedRepository {
 
-    private val apiService = ApiFactory.apiService
-    private val mapper = NewsFeedMapper()
-    private val storage = VKPreferencesKeyValueStorage(application)
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 

@@ -1,6 +1,8 @@
 [versions]
 agp = "8.10.1"
-kotlin = "1.9.0"
+kotlin = "2.1.10"
+ksp_version ="2.1.10-1.0.29"
+dagger2_version = "2.55"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -10,7 +12,14 @@ activityCompose = "1.10.1"
 composeBom = "2024.04.01"
 material3Android = "1.3.2"
 
+
 [libraries]
+#Dagger2
+dagger2 = { group = "com.google.dagger", name = "dagger", version.ref = "dagger2_version" }
+#Dagger2 кодогенратор
+dagger2-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger2_version" }
+#Dagger2 аннотации
+dagger2-android-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger2_version" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -28,6 +37,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 
 [plugins]
+#ksp
+ksp = {id = "com.google.devtools.ksp", version.ref ="ksp_version"}
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 

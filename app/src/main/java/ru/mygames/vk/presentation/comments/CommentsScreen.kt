@@ -29,21 +29,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.PostComment
+import ru.mygames.vk.presentation.ViewModelFactory
 import ru.mygames.vk.ui.theme.Black500
 import ru.mygames.vk.ui.theme.Black900
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
+    viewModelFactory: ViewModelFactory,
     onBackPressed: () -> Unit,
     feedPost: FeedPost
 ) {
     val viewModel: CommentsViewModel = viewModel(
-        factory = CommentsViewModelFactory(feedPost = feedPost, application = LocalContext.current.applicationContext as Application)
+        factory = viewModelFactory
     )
     val screenState = viewModel.screenState.collectAsState(CommentsScreenState.Initial)
     val currentState = screenState.value

@@ -28,15 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.mygames.vk.domain.entity.FeedPost
+import ru.mygames.vk.presentation.ViewModelFactory
 import ru.mygames.vk.ui.theme.DarkBlue
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NewsFeedScreen(
+    viewModelFactory: ViewModelFactory,
     modifier: Modifier = Modifier,
     onCommentClickListener: (FeedPost) -> Unit
 ){
-    val viewModel: NewsFeedViewModel = viewModel()
+    val viewModel: NewsFeedViewModel = viewModel(factory = viewModelFactory)
     Box(
         modifier = Modifier
             .fillMaxSize()

@@ -4,8 +4,9 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.PostComment
 import ru.mygames.vk.domain.repository.NewsFeedRepository
+import javax.inject.Inject
 
-class GetCommentsUseCase(
+class GetCommentsUseCase @Inject constructor(
     private val repository: NewsFeedRepository
 ) {
     operator fun invoke(feedPost: FeedPost): StateFlow<List<PostComment>>{
