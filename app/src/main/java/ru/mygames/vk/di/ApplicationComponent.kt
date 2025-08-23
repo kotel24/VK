@@ -18,8 +18,9 @@ interface ApplicationComponent {
     interface Factory {
         fun create(
             @BindsInstance context: Context,
-            @BindsInstance feedPost: FeedPost
         ): ApplicationComponent
     }
     fun inject(mainActivity: MainActivity)
+
+    fun getCommentsScreenComponentFactory(): CommentsScreenComponent.Factory
 }

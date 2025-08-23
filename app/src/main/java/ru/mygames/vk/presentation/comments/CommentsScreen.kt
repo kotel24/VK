@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.PostComment
+import ru.mygames.vk.presentation.NewsFeedApplication
 import ru.mygames.vk.presentation.ViewModelFactory
 import ru.mygames.vk.ui.theme.Black500
 import ru.mygames.vk.ui.theme.Black900
@@ -41,12 +42,15 @@ import ru.mygames.vk.ui.theme.Black900
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
-    viewModelFactory: ViewModelFactory,
     onBackPressed: () -> Unit,
     feedPost: FeedPost
 ) {
+    val component = (LocalContext.current.applicationContext as NewsFeedApplication)
+        .component.
+        getCommentsScreenComponentFactory().
+        create(feedPost)
     val viewModel: CommentsViewModel = viewModel(
-        factory = viewModelFactory
+        factory = component.getViewModelFactory()
     )
     val screenState = viewModel.screenState.collectAsState(CommentsScreenState.Initial)
     val currentState = screenState.value
