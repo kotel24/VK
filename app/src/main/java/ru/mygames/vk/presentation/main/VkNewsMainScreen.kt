@@ -15,14 +15,12 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.mygames.vk.navigation.AppNavGraph
 import ru.mygames.vk.navigation.rememberNavigationState
-import ru.mygames.vk.presentation.ViewModelFactory
 import ru.mygames.vk.presentation.comments.CommentsScreen
 import ru.mygames.vk.presentation.news.NewsFeedScreen
-import ru.mygames.vk.presentation.main.NavigationItem
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(viewModelFactory: ViewModelFactory) {
+fun MainScreen() {
     val navigationState = rememberNavigationState()
     Scaffold(
         bottomBar = {
@@ -32,7 +30,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                 val items =
                     listOf(NavigationItem.Home, NavigationItem.Favourite, NavigationItem.Profile)
                 items.forEach { item ->
-                    val selected = navBackStackEntry?.value?.destination?.hierarchy?.any{
+                    val selected = navBackStackEntry.value?.destination?.hierarchy?.any{
                         it.route == item.screen.route
                     } ?: false
                     NavigationBarItem(
@@ -56,7 +54,6 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
             navHostController = navigationState.navHostController,
             newsFeedScreenContent = {
                 NewsFeedScreen(
-                    viewModelFactory = viewModelFactory,
                     modifier = Modifier.padding(8.dp),
                     onCommentClickListener = {
 

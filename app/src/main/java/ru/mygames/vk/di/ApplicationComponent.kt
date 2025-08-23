@@ -3,8 +3,7 @@ package ru.mygames.vk.di
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
-import ru.mygames.vk.MainActivity
-import ru.mygames.vk.domain.entity.FeedPost
+import ru.mygames.vk.presentation.ViewModelFactory
 
 @ApplicationScope
 @Component(
@@ -20,7 +19,7 @@ interface ApplicationComponent {
             @BindsInstance context: Context,
         ): ApplicationComponent
     }
-    fun inject(mainActivity: MainActivity)
+    fun getViewModelFactory(): ViewModelFactory
 
     fun getCommentsScreenComponentFactory(): CommentsScreenComponent.Factory
 }

@@ -1,6 +1,5 @@
 package ru.mygames.vk.presentation.comments
 
-import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,38 +22,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.PostComment
-import ru.mygames.vk.presentation.NewsFeedApplication
-import ru.mygames.vk.presentation.ViewModelFactory
+import ru.mygames.vk.presentation.getApplicationComponent
 import ru.mygames.vk.ui.theme.Black500
 import ru.mygames.vk.ui.theme.Black900
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(
     onBackPressed: () -> Unit,
     feedPost: FeedPost
 ) {
-    val component = (LocalContext.current.applicationContext as NewsFeedApplication)
-        .component.
-        getCommentsScreenComponentFactory().
+    val component = getApplicationComponent()
+        .getCommentsScreenComponentFactory().
         create(feedPost)
     val viewModel: CommentsViewModel = viewModel(
         factory = component.getViewModelFactory()
     )
     val screenState = viewModel.screenState.collectAsState(CommentsScreenState.Initial)
+    CommentsScreenContent(
+        onBackPressed = onBackPressed,
+        screenState = screenState
+    )
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CommentsScreenContent(
+    onBackPressed: () -> Unit,
+    screenState: State<CommentsScreenState>
+){
     val currentState = screenState.value
-    if (currentState is CommentsScreenState.Comments){
+    if (currentState is CommentsScreenState.Comments) {
         Scaffold(
             topBar = {
                 TopAppBar(
