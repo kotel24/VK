@@ -1,6 +1,6 @@
 package ru.mygames.vk.data.repository
 
-import android.app.Application
+import android.util.Log
 import com.vk.api.sdk.VKPreferencesKeyValueStorage
 import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.CoroutineScope
@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import ru.mygames.vk.data.mapper.NewsFeedMapper
-import ru.mygames.vk.data.network.ApiFactory
 import ru.mygames.vk.data.network.ApiService
 import ru.mygames.vk.domain.entity.AuthState
 import ru.mygames.vk.domain.entity.FeedPost
@@ -37,6 +36,7 @@ class NewsFeedRepositoryImpl @Inject constructor (
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
             val currentToken = token
+            Log.e("NewsFeedRepositoryImpl", "Favorite request with token = ${currentToken?.accessToken}")
             val loggedIn = currentToken != null && currentToken.isValid
             val authState = if (loggedIn) AuthState.Authorized else AuthState.UnAuthorized
             emit(authState)
@@ -70,13 +70,17 @@ class NewsFeedRepositoryImpl @Inject constructor (
                 emit(feedPosts)
                 return@collect
             }
+            val favoritesResponse = apiService.loadFavorite(getAccessToken())
+            val favoriteIds = favoritesResponse.favoriteContent.items
+                .map { it.post.id }
+                .toSet()
             val response = if (startFrom == null) {
                 apiService.loadRecommendation(getAccessToken())
             } else {
                 apiService.loadRecommendation(getAccessToken(), startFrom)
             }
             nextFrom = response.newsFeedContent.nextFrom
-            val posts = mapper.mapResponseToPosts(response)
+            val posts = mapper.mapResponseToPosts(response, favoriteIds)
             _feedPosts.addAll(posts)
             emit(feedPosts)
         }
@@ -119,6 +123,10 @@ class NewsFeedRepositoryImpl @Inject constructor (
         nextDataNeededEvents.emit(Unit)
     }
 
+    override suspend fun loadFavoriteData() {
+        nextFavoritesNeededEvents.emit(Unit)
+    }
+
     override suspend fun checkAuthState() {
         checkAuthStateEvents.emit(Unit)
     }
@@ -149,14 +157,67 @@ class NewsFeedRepositoryImpl @Inject constructor (
         }
         val newLikesCount = response.likes.count
         val newStatistics = feedPost.statistics.toMutableList().apply {
-            removeIf { it.type == ItemInfo.FAVORITE }
-            add(StatisticItem(type = ItemInfo.FAVORITE, newLikesCount))
+            removeIf { it.type == ItemInfo.LIKE }
+            add(StatisticItem(type = ItemInfo.LIKE, newLikesCount))
         }
         val newPost = feedPost.copy(statistics = newStatistics, isLiked = !feedPost.isLiked)
         val postIndex = _feedPosts.indexOf(feedPost)
         _feedPosts[postIndex] = newPost
         refreshedListFlow.emit(feedPosts)
+        refreshedFavoritesFlow.emit(feedPosts)
     }
+
+    override suspend fun changeFavoriteStatus(feedPost: FeedPost) {
+        if (feedPost.isFavorite == true) {
+            apiService.removeFavorites(
+                token = getAccessToken(),
+                ownerId = feedPost.communityId,
+                postId = feedPost.id
+            )
+        } else {
+            apiService.addFavorites(
+                token = getAccessToken(),
+                ownerId = feedPost.communityId,
+                postId = feedPost.id
+            )
+        }
+        val newPost = feedPost.copy(isFavorite = !feedPost.isFavorite)
+        val postIndex = _feedPosts.indexOf(feedPost)
+        _feedPosts[postIndex] = newPost
+        refreshedListFlow.emit(feedPosts)
+
+    }
+
+    private val _favoritePosts = mutableListOf<FeedPost>()
+    private val favoritePosts: List<FeedPost>
+        get() = _favoritePosts.toList()
+
+    private val nextFavoritesNeededEvents = MutableSharedFlow<Unit>(replay = 1)
+    private val refreshedFavoritesFlow = MutableSharedFlow<List<FeedPost>>()
+
+    private val loadedFavoritesFlow = nextFavoritesNeededEvents
+        .onStart { emit(Unit) } // ← автозапуск
+        .map {
+            val response = apiService.loadFavorite(getAccessToken())
+            val posts = mapper.mapResponseToFavorites(response)
+            _favoritePosts.clear()
+            _favoritePosts.addAll(posts)
+            favoritePosts
+        }
+        .retry {
+            delay(RETRY_TIMEOUT_MILLIS)
+            true
+        }
+
+    private val favorites: StateFlow<List<FeedPost>> = loadedFavoritesFlow
+        .mergeWith(refreshedFavoritesFlow)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = favoritePosts
+        )
+
+    override fun getFavorites(): StateFlow<List<FeedPost>> = favorites
 
     companion object {
 

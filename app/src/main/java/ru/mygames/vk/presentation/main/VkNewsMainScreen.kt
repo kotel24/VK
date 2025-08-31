@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.mygames.vk.navigation.AppNavGraph
 import ru.mygames.vk.navigation.rememberNavigationState
 import ru.mygames.vk.presentation.comments.CommentsScreen
+import ru.mygames.vk.presentation.favorites.FavoritesScreen
 import ru.mygames.vk.presentation.news.NewsFeedScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -67,7 +68,14 @@ fun MainScreen() {
                     feedPost = feedPost
                 )
             },
-            favoriteScreenContent = { Text(text = "Favourite") },
+            favoriteScreenContent = {
+                FavoritesScreen(
+                    modifier = Modifier.padding(8.dp),
+                    onCommentClickListener = {
+                        navigationState.navigateToComments(it)
+                    }
+                )
+            },
             profileScreenContent = { Text(text = "Profile") }
         )
     }

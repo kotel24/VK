@@ -1,4 +1,4 @@
-package ru.mygames.vk.presentation.news
+package ru.mygames.vk.presentation.favorites
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,42 +13,44 @@ import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.usecase.ChangeFavoriteStatusUseCase
 import ru.mygames.vk.domain.usecase.ChangeLikeStatusUseCase
 import ru.mygames.vk.domain.usecase.DeletePostUseCase
-import ru.mygames.vk.domain.usecase.GetRecommendationsUseCase
+import ru.mygames.vk.domain.usecase.GetFavoritesUseCase
 import ru.mygames.vk.extensions.mergeWith
+import ru.mygames.vk.presentation.news.NewsFeedScreenState
 import javax.inject.Inject
 
-class NewsFeedViewModel @Inject constructor(
-    private val getRecommendationsUseCase: GetRecommendationsUseCase,
+class FavoritesViewModel @Inject constructor(
+    private val getFavoritesUseCase: GetFavoritesUseCase,
     private val changeLikeStatusUseCase: ChangeLikeStatusUseCase,
     private val deletePostUseCase: DeletePostUseCase,
     private val changeFavoriteStatusUseCase: ChangeFavoriteStatusUseCase,
 ) : ViewModel() {
     private val exceptionHandler = CoroutineExceptionHandler{_, _ ->
-        Log.d("NewsFeedViewModel", "Error occurred in coroutine")
+        Log.d("FavoritesViewModel", "Error occurred in coroutine")
     }
 
-    private val recommendationsFlow = getRecommendationsUseCase()
-    private val loadNextDataFlow = MutableSharedFlow<NewsFeedScreenState>()
-    val screenState = recommendationsFlow
+    private val favoritesFlow = getFavoritesUseCase()
+    private val loadNextDataFlow = MutableSharedFlow<FavoritesScreenState>()
+    val screenState = favoritesFlow
         .filter { it.isNotEmpty() }
-        .map { NewsFeedScreenState.Posts(posts = it) as NewsFeedScreenState }
-        .onStart { emit(NewsFeedScreenState.Loading) }
+        .map { FavoritesScreenState.Posts(posts = it) as FavoritesScreenState }
+        .onStart { emit(FavoritesScreenState.Loading) }
         .mergeWith(loadNextDataFlow)
 
-    fun loadNextRecommendations() {
-        viewModelScope.launch {
-            loadNextDataFlow.emit(
-                NewsFeedScreenState.Posts(
-                    posts = recommendationsFlow.value,
-                    nextDataIsLoading = true
-                )
-            )
-        }
-    }
 
     fun changeLikeStatus(feedPost: FeedPost) {
         viewModelScope.launch (exceptionHandler) {
             changeLikeStatusUseCase(feedPost)
+        }
+    }
+
+    fun loadNextRecommendations() {
+        viewModelScope.launch {
+            loadNextDataFlow.emit(
+                FavoritesScreenState.Posts(
+                    posts = favoritesFlow.value,
+                    nextDataIsLoading = true
+                )
+            )
         }
     }
 

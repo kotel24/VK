@@ -2,7 +2,6 @@ package ru.mygames.vk.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.mygames.vk.di.ApplicationScope
 import javax.inject.Inject
 import javax.inject.Provider
 

@@ -1,6 +1,7 @@
 package ru.mygames.vk.data.mapper
 
 import ru.mygames.vk.data.model.CommentsResponseDto
+import ru.mygames.vk.data.model.FavoriteResponseDto
 import ru.mygames.vk.data.model.NewsFeedResponseDto
 import ru.mygames.vk.domain.entity.FeedPost
 import ru.mygames.vk.domain.entity.ItemInfo
@@ -33,7 +34,11 @@ class NewsFeedMapper @Inject constructor(){
         }
         return result
     }
-    fun mapResponseToPosts(responseDto: NewsFeedResponseDto): List<FeedPost>{
+
+    fun mapResponseToPosts(
+        responseDto: NewsFeedResponseDto,
+        favoriteIds: Set<Long>,
+    ): List<FeedPost>{
         val result = mutableListOf<FeedPost>()
 
         val posts = responseDto.newsFeedContent.posts
@@ -51,7 +56,7 @@ class NewsFeedMapper @Inject constructor(){
                 contentImageUrl = post.attachments?.firstOrNull()?.photo?.photoUrls?.lastOrNull()?.url,
                 statistics = listOf(
                     StatisticItem(
-                        type = ItemInfo.FAVORITE,
+                        type = ItemInfo.LIKE,
                         count = post.likes.count,
                     ),
                     StatisticItem(
@@ -65,15 +70,50 @@ class NewsFeedMapper @Inject constructor(){
                     StatisticItem(
                         type = ItemInfo.VIEW,
                         count = post.views.count
-                    )
+                    ),
+                    StatisticItem(
+                        type = ItemInfo.FAVORITE,
+                )
                 ),
-                isLiked = post.likes.userLikes > 0
-
+                isLiked = post.likes.userLikes > 0,
+                isFavorite = favoriteIds.contains(post.id) == true
             )
             result.add(feedPost)
         }
         return result
     }
+
+    fun mapResponseToFavorites(
+        responseDto: FavoriteResponseDto
+    ): List<FeedPost> {
+        val result = mutableListOf<FeedPost>()
+
+        val posts = responseDto.favoriteContent.items.map { it.post }
+
+        for (post in posts) {
+            val feedPost = FeedPost(
+                id = post.id,
+                communityId = post.communityId, // тут owner_id
+                communityName = "", // пока пусто, т.к. groups нет
+                publicationDate = refactorDate(post.date),
+                communityImageUrl = "", // тоже пока null
+                contentText = post.text,
+                contentImageUrl = post.attachments?.firstOrNull()?.photo?.photoUrls?.lastOrNull()?.url,
+                statistics = listOf(
+                    StatisticItem(ItemInfo.LIKE, post.likes?.count ?: 0),
+                    StatisticItem(ItemInfo.COMMENT, post.comments?.count ?: 0),
+                    StatisticItem(ItemInfo.REPOST, post.reposts?.count ?: 0),
+                    StatisticItem(ItemInfo.VIEW, post.views?.count ?: 0),
+                    StatisticItem(ItemInfo.FAVORITE, 0)
+                ),
+                isLiked = post.likes?.userLikes ?: 0 > 0,
+                isFavorite = true
+            )
+            result.add(feedPost)
+        }
+        return result
+    }
+
     private fun refactorDate(timestamp: Long): String{
         val date = Date(timestamp * 1000)
         return SimpleDateFormat("d MMMM yyyy, hh:mm", Locale.getDefault()).format(date)

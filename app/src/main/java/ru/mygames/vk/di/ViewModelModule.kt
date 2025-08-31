@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
-import ru.mygames.vk.presentation.comments.CommentsViewModel
+import ru.mygames.vk.presentation.favorites.FavoritesViewModel
 import ru.mygames.vk.presentation.main.MainViewModel
 import ru.mygames.vk.presentation.news.NewsFeedViewModel
 
@@ -19,4 +19,9 @@ interface ViewModelModule {
     @ViewModelKey(MainViewModel::class)
     @Binds
     fun bindMainViewModel(viewModel: MainViewModel): ViewModel
+
+    @IntoMap
+    @ViewModelKey(FavoritesViewModel::class)
+    @Binds
+    fun bindFavoritesViewModel(viewModel: FavoritesViewModel): ViewModel
 }

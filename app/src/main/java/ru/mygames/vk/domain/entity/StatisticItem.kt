@@ -5,5 +5,5 @@ data class StatisticItem(
     val count: Int = 0
 )
 enum class ItemInfo{
-    VIEW, FAVORITE, REPOST, COMMENT
+    VIEW, LIKE, REPOST, COMMENT, FAVORITE
 }

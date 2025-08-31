@@ -15,9 +15,15 @@ interface NewsFeedRepository {
 
     suspend fun loadNextData()
 
+    suspend fun loadFavoriteData()
+
     suspend fun checkAuthState()
 
     suspend fun deletePost(feedPost: FeedPost)
 
     suspend fun changeLikeStatus(feedPost: FeedPost)
+
+    suspend fun changeFavoriteStatus(feedPost: FeedPost)
+
+    fun getFavorites(): StateFlow<List<FeedPost>>
 }

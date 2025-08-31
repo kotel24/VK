@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -37,13 +39,14 @@ import ru.mygames.vk.domain.entity.StatisticItem
 import ru.mygames.vk.ui.theme.Black500
 
 @Composable
-fun PostCard (
-    viewModel: NewsFeedViewModel,
+fun PostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onCommentClickListener: (FeedPost) -> Unit,
+    onFavoriteClick: (FeedPost) -> Unit,
+    onLikeClick: (FeedPost) -> Unit,
+    onCommentClick: (FeedPost) -> Unit,
 ) {
-    Card (
+    Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = RoundedCornerShape(4.dp).copy(
             bottomStart = CornerSize(0.dp),
@@ -51,20 +54,26 @@ fun PostCard (
         ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
     ) {
-        Item(modifier, feedPost)
+        Item(
+            modifier,
+            feedPost,
+            onFavoriteClickListener = { onFavoriteClick(feedPost) }
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Statistics(
             statistics = feedPost.statistics,
-            onLikeClickListener = { viewModel.changeLikeStatus(feedPost)},
-            onCommentClickListener = { onCommentClickListener(feedPost)},
-            isFavorite = feedPost.isLiked)
+            onLikeClickListener = { onLikeClick(feedPost) },
+            onCommentClickListener = { onCommentClick(feedPost) },
+            isFavorite = feedPost.isLiked
+        )
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
 @Composable
 fun Item(
     modifier: Modifier = Modifier,
-    feedPost: FeedPost
+    feedPost: FeedPost,
+    onFavoriteClickListener: (StatisticItem) -> Unit,
 ){
     Column {
         Row (modifier = Modifier
@@ -83,6 +92,15 @@ fun Item(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text( text = feedPost.publicationDate, color = Black500)
             }
+            val favoriteItem = feedPost.statistics.getItemByType(ItemInfo.FAVORITE)
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                tint = if (feedPost.isFavorite) Color.Yellow else Black500,
+                modifier = Modifier.clickable {
+                    onFavoriteClickListener(favoriteItem)
+                }
+            )
             Icon(
                 imageVector = Icons.Rounded.MoreVert,
                 contentDescription = null,
@@ -132,12 +150,12 @@ fun Statistics(
                 onItemClickListener = {
                     onCommentClickListener(commentItem)
                 })
-            val favoriteItem = statistics.getItemByType(ItemInfo.FAVORITE)
+            val likeItem = statistics.getItemByType(ItemInfo.LIKE)
             IconWithText(
                 iconResId = if (isFavorite) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24,
-                text = formatStatisticsCount(favoriteItem.count),
+                text = formatStatisticsCount(likeItem.count),
                 onItemClickListener = {
-                    onLikeClickListener(favoriteItem)
+                    onLikeClickListener(likeItem)
                 }
             )
         }
